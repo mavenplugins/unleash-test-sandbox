@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.github.mavenplugins.test</groupId>
+    <artifactId>unleash-sandbox-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>unleash-sandbox-app</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Unleash Sandbox Application</name>
+
+  <dependencies>
+    <!-- 3rd PARTY DEPENDENCIES -->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+
+    <!-- TEST -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.tngtech.java</groupId>
+      <artifactId>junit-dataprovider</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.github.mavenplugins.test</groupId>
+        <artifactId>unleash-sandbox-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>info-message</id>
+            <goals>
+              <goal>logMessages</goal>
+            </goals>
+            <configuration>
+              <infoLogs>
+                <infoLog>Hello from ${project.groupId}:${project.artifactId}:${project.version}</infoLog>
+              </infoLogs>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

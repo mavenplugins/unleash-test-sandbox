@@ -1,0 +1,11 @@
+#maven excludes
+target/
+
+#eclipse excludes
+.classpath
+.project
+.settings/
+
+#intellij idea excludes
+.idea
+*.iml
