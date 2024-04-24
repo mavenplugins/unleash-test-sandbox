@@ -6,7 +6,8 @@
   <parent>
     <groupId>io.github.mavenplugins</groupId>
     <artifactId>org-parent</artifactId>
-    <version>3-SNAPSHOT</version>
+    <version>3</version>
+    <relativePath></relativePath>
   </parent>
 
   <groupId>io.github.mavenplugins.test</groupId>
@@ -50,6 +51,13 @@
   </modules>
 
   <properties>
+    <!-- Override Unleash plugin versions -->
+    <version.unleash-maven-plugin>2.11.0</version.unleash-maven-plugin>
+    <!-- Unleash SCM Provider (Git) -->
+    <version.unleash-scm-provider>2.4.1-SNAPSHOT</version.unleash-scm-provider>
+    <!-- Unleash CDI Plugin Hooks -->
+    <version.cdi-plugin-hooks>0.1.2</version.cdi-plugin-hooks>
+
     <version.java>1.8</version.java>
     <javadoc.doclint>none</javadoc.doclint>
     <!-- MAVEN -->
