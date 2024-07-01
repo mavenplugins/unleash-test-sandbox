@@ -39,3 +39,17 @@ jobs:
       releaseToMavenCentral: false
       enforceUnleashReleaseWorkflow: false
       unleashWorkflowURL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref }}/workflows/logScmProviderTagAndMsgPrefix.txt
+
+  job_Test_Unleash_02:
+    name: Test 02 performReleaseNoDeployWithRollback.txt
+    needs: job_Test_Unleash_01
+    # Elevate permission on repo content to write to allow git pushing
+    permissions:
+      contents: write
+    secrets: inherit
+    uses: mavenplugins/reusable-gh-actions/.github/workflows/__maven_unleash.yml@master
+    with:
+      runner: ubuntu-latest
+      releaseToMavenCentral: false
+      enforceUnleashReleaseWorkflow: false
+      unleashWorkflowURL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref }}/workflows/performReleaseNoDeployWithRollback.txt
