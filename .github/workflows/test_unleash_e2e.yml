@@ -3,9 +3,9 @@ name: Test Maven Unleash E2E
 on:
   workflow_dispatch:
         
-  push:
-    branches:
-      - 'test/unleash_e2e'
+  #push:
+  #  branches:
+  #    - 'test/unleash_e2e'
 
 env:
   UNLEASH_WORKFLOWS_BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref }}/workflows
