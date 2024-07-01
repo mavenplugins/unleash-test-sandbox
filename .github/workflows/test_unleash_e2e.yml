@@ -1,0 +1,41 @@
+name: Test Maven Unleash E2E
+
+on:
+  workflow_dispatch:
+        
+  push:
+    branches:
+      - 'test/unleash_e2e'
+
+env:
+  UNLEASH_WORKFLOWS_BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref }}/workflows
+  RESTRICTED_UNLEASH_TEST_REF: refs/heads/test/unleash_e2e
+  
+jobs:
+  job_Validate_TestBranch:
+    name: Validate Test Branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate Running on Test Branch
+        run: |
+          echo "UNLEASH_WORKFLOWS_BASE_URL: ${{ env.UNLEASH_WORKFLOWS_BASE_URL }}"
+          echo "Expected ref: ${{ env.RESTRICTED_UNLEASH_TEST_REF }}"
+          echo "Actual ref:   ${{ github.ref }}"
+          if [[ ! "${{ github.ref }}" == "${{ env.RESTRICTED_UNLEASH_TEST_REF }}" ]]; then
+            echo "### ERROR: This Action must run on ref ${{ env.RESTRICTED_UNLEASH_TEST_REF }} only!"
+            exit 1
+          fi
+
+  job_Test_Unleash_01:
+    name: Test 01 logScmProviderTagAndMsgPrefix.txt
+    needs: job_Validate_TestBranch
+    # Elevate permission on repo content to write to allow git pushing
+    permissions:
+      contents: write
+    secrets: inherit
+    uses: mavenplugins/reusable-gh-actions/.github/workflows/__maven_unleash.yml@master
+    with:
+      runner: ubuntu-latest
+      releaseToMavenCentral: false
+      enforceUnleashReleaseWorkflow: false
+      unleashWorkflowURL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref }}/workflows/logScmProviderTagAndMsgPrefix.txt

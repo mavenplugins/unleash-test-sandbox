@@ -4,3 +4,6 @@
 [![CI](https://github.com/mavenplugins/unleash-test-sandbox/actions/workflows/build_and_deploy.yml/badge.svg)](https://github.com/mavenplugins/unleash-test-sandbox/actions/workflows/build_and_deploy.yml)
 
 A project supposed to test [unleash-maven-plugin](https://github.com/mavenplugins/unleash-maven-plugin) perform variants and workflows on.
+
+## Test Command Examples
+- `mvnDebug unleash:perform -Dworkflow=workflows/logScmProviderTagAndMsgPrefix.txt -Dunleash.scmMessagePrefix="JIRA-1 :: [unleash PRODUCT@{project.version}]\n\n"`
