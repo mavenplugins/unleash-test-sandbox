@@ -21,9 +21,7 @@ removeSpyPlugin
 checkForScmChanges
 tagScm
 #enforce rollback at this stage:
-exec {
-  data=false
-}
+exitWithRollbackNoError
 #detectReleaseArtifacts
 ##
 ## Add custom deploy step here based on our projects

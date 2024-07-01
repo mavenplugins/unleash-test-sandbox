@@ -36,9 +36,7 @@ setDevVersion
 serializeMetadata
 installArtifacts
 #enforce rollback:
-exec {
-  data=false
-}
+exitWithRollbackNoError
 #
 # Disable default workflows deployment.
 # This does not yet work to deploy to Maven Central via staging.
