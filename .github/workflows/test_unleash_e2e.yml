@@ -3,14 +3,22 @@ name: Test Maven Unleash E2E
 on:
   workflow_dispatch:
         
+  # NEVER enable push - this will run infinite for this workflow since of self re-triggering!
   #push:
-  #  branches:
-  #    - 'test/unleash_e2e'
+    #branches:
+    #  - 'test/unleash_e2e'
+
+concurrency:
+  # Ensure this workflow is running single at a time
+  #group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 
 env:
   UNLEASH_WORKFLOWS_BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref }}/workflows
   RESTRICTED_UNLEASH_TEST_REF: refs/heads/test/unleash_e2e
-  
+  UNLEASH_E2E_TEST_RESET_TAG: UNLEASH_E2E_TEST_RESET_TAG
+
 jobs:
   job_Validate_TestBranch:
     name: Validate Test Branch
@@ -26,9 +34,32 @@ jobs:
             exit 1
           fi
 
+  job_Reset_TestBranch:
+    name: Reset Test Branch
+    needs: job_Validate_TestBranch
+    runs-on: ubuntu-latest
+    # Elevate permission on repo content to write to allow git pushing
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout test branch
+        uses: actions/checkout@v4
+        with:
+          # We need full history! - otherwise we end up in "missing commits" issue on unleash plugin
+          fetch-depth: 0
+          # Explicitly provide the ref path rather than using the original triggering SHA,
+          # since that might have changed by particular jobs in multi job scenarios
+          ref: ${{ github.ref }}
+        
+      - name: Force reset of test branch
+        run: |
+          RESET_COMMIT_SHA1=$(git log ${{ env.UNLEASH_E2E_TEST_RESET_TAG }} --max-count=1 --pretty=%H)
+          git reset --hard ${RESET_COMMIT_SHA1}
+          git push -f origin ${{ github.ref }}
+
   job_Test_Unleash_01:
     name: Test 01 logScmProviderTagAndMsgPrefix.txt
-    needs: job_Validate_TestBranch
+    needs: job_Reset_TestBranch
     # Elevate permission on repo content to write to allow git pushing
     permissions:
       contents: write
