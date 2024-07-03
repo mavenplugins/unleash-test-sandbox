@@ -28,11 +28,6 @@
       <artifactId>maven-core</artifactId>
       <scope>provided</scope>
       <exclusions>
-        <!-- This cdi-api dependency overlaps with CDI dependencies defined above -->
-        <exclusion>
-          <groupId>javax.enterprise</groupId>
-          <artifactId>cdi-api</artifactId>
-        </exclusion>
         <exclusion>
           <!-- This exclusion is key to comply with the m2e embedded implementation at runtime -->
           <groupId>org.apache.maven</groupId>
@@ -73,7 +68,7 @@
         <version>${version.maven-plugin-plugin}</version>
         <configuration>
           <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-<!--          <goalPrefix>unleash</goalPrefix>-->
+          <!-- <goalPrefix>unleash-sandbox</goalPrefix>-->
         </configuration>
         <executions>
           <execution>
@@ -87,7 +82,7 @@
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
-        <version>1.7.1</version>
+        <version>${version.plexus-component-metadata}</version>
         <executions>
           <execution>
             <goals>

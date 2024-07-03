@@ -1,2 +1,5 @@
 logScmProviderName
 logScmTagAndMsgPrefix
+exec {
+  data=echo "Echo from exec hook action SUCCEEDED!"
+}
