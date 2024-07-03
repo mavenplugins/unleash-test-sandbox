@@ -58,8 +58,15 @@ jobs:
           git push -f origin ${{ github.ref }}
 
   job_Test_Unleash_01:
-    name: Test 01 logScmProviderTagAndMsgPrefix.txt
+    # Test 01 logScmProviderTagAndMsgPrefix.txt
+    name: T01
     needs: job_Reset_TestBranch
+    strategy:
+      max-parallel: 1
+      matrix:
+        # use newer versions first
+        javaVersion: [21, 17, 11, 8]
+        mavenVersion: [3.9.8, 3.8.3, 3.6.3]
     # Elevate permission on repo content to write to allow git pushing
     permissions:
       contents: write
@@ -70,10 +77,20 @@ jobs:
       releaseToMavenCentral: false
       enforceUnleashReleaseWorkflow: false
       unleashWorkflowURL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref }}/workflows/logScmProviderTagAndMsgPrefix.txt
+      mavenVersion: ${{ matrix.mavenVersion }}
+      mavenOpts: -Dversion.java=${{ matrix.javaVersion }}
+      javaHomeVersion: ${{ matrix.javaVersion }}
 
   job_Test_Unleash_02:
-    name: Test 02 RollbackAfterTagScm
+    # Test 02 RollbackAfterTagScm
+    name: T02
     needs: job_Test_Unleash_01
+    strategy:
+      max-parallel: 1
+      matrix:
+        # use newer versions first
+        javaVersion: [21, 17, 11, 8]
+        mavenVersion: [3.9.8, 3.8.3, 3.6.3]
     # Elevate permission on repo content to write to allow git pushing
     permissions:
       contents: write
@@ -84,10 +101,20 @@ jobs:
       releaseToMavenCentral: false
       enforceUnleashReleaseWorkflow: false
       unleashWorkflowURL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref }}/workflows/performReleaseRollbackAfterTagScm.txt
+      mavenVersion: ${{ matrix.mavenVersion }}
+      mavenOpts: -Dversion.java=${{ matrix.javaVersion }}
+      javaHomeVersion: ${{ matrix.javaVersion }}
 
   job_Test_Unleash_03:
-    name: Test 03 NoDeployRollbackAfterInstallArtifacts
+    # Test 03 NoDeployRollbackAfterInstallArtifacts
+    name: T03
     needs: job_Test_Unleash_02
+    strategy:
+      max-parallel: 1
+      matrix:
+        # use newer versions first
+        javaVersion: [21, 17, 11, 8]
+        mavenVersion: [3.9.8, 3.8.3, 3.6.3]
     # Elevate permission on repo content to write to allow git pushing
     permissions:
       contents: write
@@ -98,3 +125,6 @@ jobs:
       releaseToMavenCentral: false
       enforceUnleashReleaseWorkflow: false
       unleashWorkflowURL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref }}/workflows/performReleaseNoDeployRollbackAfterInstallArtifacts.txt
+      mavenVersion: ${{ matrix.mavenVersion }}
+      mavenOpts: -Dversion.java=${{ matrix.javaVersion }}
+      javaHomeVersion: ${{ matrix.javaVersion }}
