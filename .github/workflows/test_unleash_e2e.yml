@@ -14,29 +14,41 @@ concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: false
 
-env:
-  UNLEASH_WORKFLOWS_BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref }}/workflows
-  RESTRICTED_UNLEASH_TEST_REF: refs/heads/test/unleash_e2e
-  UNLEASH_E2E_TEST_RESET_TAG: UNLEASH_E2E_TEST_RESET_TAG
+# Following variables from vars context are being expected:
+#   vars.UNLEASH_E2E_TEST_REF
+#   vars.UNLEASH_E2E_TEST_RESET_TAG
+#   vars.UNLEASH_E2E_TEST_WORKFLOWS_BASE_URL
 
 jobs:
-  job_Validate_TestBranch:
-    name: Validate Test Branch
+  job_Validate_VarsAndTestBranch:
+    name: Validate Vars And Test Ref
+    if: github.ref == vars.UNLEASH_E2E_TEST_REF
     runs-on: ubuntu-latest
     steps:
+      - name: Validate Expected Variables
+        run: |
+          echo "vars.UNLEASH_E2E_TEST_REF:                \"${{ vars.UNLEASH_E2E_TEST_REF }}\""
+          echo "vars.UNLEASH_E2E_TEST_RESET_TAG:          \"${{ vars.UNLEASH_E2E_TEST_RESET_TAG }}\""
+          echo "vars.UNLEASH_E2E_TEST_WORKFLOWS_BASE_URL: \"${{ vars.UNLEASH_E2E_TEST_WORKFLOWS_BASE_URL }}\""
+          if [[    -z "${{ vars.UNLEASH_E2E_TEST_REF }}" \
+                || -z "${{ vars.UNLEASH_E2E_TEST_RESET_TAG }}" \
+                || -z "${{ vars.UNLEASH_E2E_TEST_WORKFLOWS_BASE_URL }}" \
+             ]]; then
+            echo "### ERROR: At least one of the before listed variables is not set or it is not visible for this repo!"
+            exit 1
+          fi
       - name: Validate Running on Test Branch
         run: |
-          echo "UNLEASH_WORKFLOWS_BASE_URL: ${{ env.UNLEASH_WORKFLOWS_BASE_URL }}"
-          echo "Expected ref: ${{ env.RESTRICTED_UNLEASH_TEST_REF }}"
+          echo "Expected ref: ${{ vars.UNLEASH_E2E_TEST_REF }}"
           echo "Actual ref:   ${{ github.ref }}"
-          if [[ ! "${{ github.ref }}" == "${{ env.RESTRICTED_UNLEASH_TEST_REF }}" ]]; then
-            echo "### ERROR: This Action must run on ref ${{ env.RESTRICTED_UNLEASH_TEST_REF }} only!"
+          if [[ ! "${{ github.ref }}" == "${{ vars.UNLEASH_E2E_TEST_REF }}" ]]; then
+            echo "### ERROR: This Action must run on ref ${{ vars.UNLEASH_E2E_TEST_REF }} only!"
             exit 1
           fi
 
   job_Reset_TestBranch:
     name: Reset Test Branch
-    needs: job_Validate_TestBranch
+    needs: job_Validate_VarsAndTestBranch
     runs-on: ubuntu-latest
     # Elevate permission on repo content to write to allow git pushing
     permissions:
@@ -53,7 +65,7 @@ jobs:
         
       - name: Force reset of test branch
         run: |
-          RESET_COMMIT_SHA1=$(git log ${{ env.UNLEASH_E2E_TEST_RESET_TAG }} --max-count=1 --pretty=%H)
+          RESET_COMMIT_SHA1=$(git log ${{ vars.UNLEASH_E2E_TEST_RESET_TAG }} --max-count=1 --pretty=%H)
           git reset --hard ${RESET_COMMIT_SHA1}
           git push -f origin ${{ github.ref }}
 
@@ -76,7 +88,7 @@ jobs:
       runner: ubuntu-latest
       releaseToMavenCentral: false
       enforceUnleashReleaseWorkflow: false
-      unleashWorkflowURL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref }}/workflows/logScmProviderTagAndMsgPrefix.txt
+      unleashWorkflowURL: ${{vars.UNLEASH_E2E_TEST_WORKFLOWS_BASE_URL }}/logScmProviderTagAndMsgPrefix.txt
       mavenVersion: ${{ matrix.mavenVersion }}
       mavenOpts: -Dversion.java=${{ matrix.javaVersion }}
       javaHomeVersion: ${{ matrix.javaVersion }}
@@ -100,7 +112,7 @@ jobs:
       runner: ubuntu-latest
       releaseToMavenCentral: false
       enforceUnleashReleaseWorkflow: false
-      unleashWorkflowURL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref }}/workflows/performReleaseRollbackAfterTagScm.txt
+      unleashWorkflowURL: ${{vars.UNLEASH_E2E_TEST_WORKFLOWS_BASE_URL }}/performReleaseRollbackAfterTagScm.txt
       mavenVersion: ${{ matrix.mavenVersion }}
       mavenOpts: -Dversion.java=${{ matrix.javaVersion }}
       javaHomeVersion: ${{ matrix.javaVersion }}
@@ -124,7 +136,7 @@ jobs:
       runner: ubuntu-latest
       releaseToMavenCentral: false
       enforceUnleashReleaseWorkflow: false
-      unleashWorkflowURL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref }}/workflows/performReleaseNoDeployRollbackAfterInstallArtifacts.txt
+      unleashWorkflowURL: ${{vars.UNLEASH_E2E_TEST_WORKFLOWS_BASE_URL }}/performReleaseNoDeployRollbackAfterInstallArtifacts.txt
       mavenVersion: ${{ matrix.mavenVersion }}
       mavenOpts: -Dversion.java=${{ matrix.javaVersion }}
       javaHomeVersion: ${{ matrix.javaVersion }}
