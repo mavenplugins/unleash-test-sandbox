@@ -7,3 +7,6 @@ A project supposed to test [unleash-maven-plugin](https://github.com/mavenplugin
 
 ## Test Command Examples
 - `mvnDebug unleash:perform -Dworkflow=workflows/logScmProviderTagAndMsgPrefix.txt -Dunleash.scmMessagePrefix="JIRA-1 :: [unleash PRODUCT@{project.version}]\n\n"`
+
+## Contributors
+[![Code Contributors](https://contrib.rocks/image?repo=mavenplugins/unleash-test-sandbox)](https://github.com/mavenplugins/unleash-test-sandbox/graphs/contributors)

@@ -56,7 +56,7 @@
     <!-- Unleash SCM Provider (Git) -->
     <version.unleash-scm-provider-git>3.0.0-SNAPSHOT</version.unleash-scm-provider-git>
     <!-- Unleash CDI Plugin Hooks -->
-    <version.cdi-plugin-hooks>0.2.0-SNAPSHOT</version.cdi-plugin-hooks>
+    <version.cdi-plugin-hooks>0.2.1-SNAPSHOT</version.cdi-plugin-hooks>
 
     <version.java>1.8</version.java>
     <javadoc.doclint>none</javadoc.doclint>

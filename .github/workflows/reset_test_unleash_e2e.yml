@@ -1,0 +1,61 @@
+name: Reset Test Unleash E2E Branch
+
+on:
+  workflow_dispatch:
+        
+  push:
+    branches:
+      - 'master'
+
+concurrency:
+  # Ensure this workflow is running single at a time
+  #group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ vars.UNLEASH_E2E_TEST_REF }}
+  cancel-in-progress: false
+
+# Following variables from vars context are being expected:
+#   vars.UNLEASH_E2E_TEST_REF
+#   vars.UNLEASH_E2E_TEST_RESET_REF
+
+jobs:
+  job_Validate_Vars:
+    name: Validate Vars
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate Expected Variables
+        run: |
+          echo "vars.UNLEASH_E2E_TEST_REF:                \"${{ vars.UNLEASH_E2E_TEST_REF }}\""
+          echo "vars.UNLEASH_E2E_TEST_RESET_REF:          \"${{ vars.UNLEASH_E2E_TEST_RESET_REF }}\""
+          if [[    -z "${{ vars.UNLEASH_E2E_TEST_REF }}" \
+                || -z "${{ vars.UNLEASH_E2E_TEST_RESET_REF }}" \
+             ]]; then
+            echo "### ERROR: At least one of the before listed variables is not set or it is not visible for this repo!"
+            exit 1
+          fi
+
+  job_Reset_TestBranch:
+    name: Reset Test Branch
+    needs: job_Validate_Vars
+    runs-on: ubuntu-latest
+    # Elevate permission on repo content to write to allow git pushing
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - name: Checkout test branch
+        uses: actions/checkout@v4
+        with:
+          # We need full history! - otherwise we end up in "missing commits" issue on unleash plugin
+          fetch-depth: 0
+          # Explicitly provide the ref path rather than using the original triggering SHA,
+          # since that might have changed by particular jobs in multi job scenarios
+          ref: ${{ vars.UNLEASH_E2E_TEST_REF }}
+          token: ${{ secrets.SERVICE_USER_PAT }}
+        
+      - name: Force reset of test branch
+        run: |
+          git fetch --all
+          RESET_COMMIT_SHA1=$(git log ${{ vars.UNLEASH_E2E_TEST_RESET_REF }} --max-count=1 --pretty=%H)
+          git reset --hard ${RESET_COMMIT_SHA1}
+          git push -f origin ${{ vars.UNLEASH_E2E_TEST_REF }}
