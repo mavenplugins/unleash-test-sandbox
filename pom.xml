@@ -52,7 +52,7 @@
 
   <properties>
     <!-- Override Unleash plugin versions -->
-    <version.unleash-maven-plugin>3.0.3-SNAPSHOT</version.unleash-maven-plugin>
+    <version.unleash-maven-plugin>3.0.4-SNAPSHOT</version.unleash-maven-plugin>
     <!-- Unleash SCM Provider (Git) -->
     <version.unleash-scm-provider-git>3.0.2-SNAPSHOT</version.unleash-scm-provider-git>
     <!-- Unleash CDI Plugin Hooks -->
