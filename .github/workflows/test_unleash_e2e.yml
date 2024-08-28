@@ -59,6 +59,7 @@ jobs:
             exit 1
           fi
 
+
   job_Reset_TestBranch:
     name: Reset Test Branch
     needs: job_Validate_VarsAndTestBranch
@@ -84,10 +85,116 @@ jobs:
           git reset --hard ${RESET_COMMIT_SHA1}
           git push -f origin ${{ github.ref }}
 
+
+  job_Test_Unleash_Version_Goals:
+    name: Test Version Goals
+    needs: job_Reset_TestBranch
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # use newer versions first
+        javaVersion: [21, 17, 11, 8]
+        mavenVersion: [3.9.8, 3.8.3, 3.6.3]
+    steps:
+      - name: Checkout test branch
+        uses: actions/checkout@v4
+        with:
+          # Explicitly provide the ref path rather than using the original triggering SHA,
+          # since that might have changed by particular jobs in multi job scenarios
+          ref: ${{ github.ref }}
+          token: ${{ secrets.SERVICE_USER_PAT }}
+        
+      # Setup JAVA home with Maven settings
+      - name: Setup JAVA home with Maven settings.xml
+        id: setup-java-home
+        uses: GHCICD/setup-java@vHEAD-GHCICD-552
+        with:
+          java-version: ${{ matrix.javaVersion }}
+          distribution: zulu
+ 
+      - name: Determine default installed Maven version
+        id: default-maven
+        run: |
+          DEFAULT_MAVEN_VERSION="$(mvn -q -v)"
+          echo "maven-version=${DEFAULT_MAVEN_VERSION}" >> $GITHUB_OUTPUT
+          echo "Default installed Maven version: ${DEFAULT_MAVEN_VERSION}"
+
+      - name: Update Maven version if required
+        uses: mavenplugins/actions-setup-maven@vHEAD
+        if: matrix.mavenVersion != steps.default-maven.outputs.maven-version
+        with:
+          maven-version: '${{ matrix.mavenVersion }}'
+
+      - name: Test unleash version goals
+        run: |
+
+          # _calcNextSnapshotVersionExpected
+          # $1 current release version
+          # $2 (optional) index of version to increment
+          _calcNextSnapshotVersionExpected() {
+            _EXPECTED_RELEASE_VERSION=${1}
+            _INDEX_DIGIT_TO_INCREMENT=${2}
+            # Validate expected release version
+            if [[ ! "${_EXPECTED_RELEASE_VERSION}" =~ ^[0-9]+(\.[0-9]+){0,3}$ ]]; then
+              echo "### ERROR: _EXPECTED_RELEASE_VERSION=${_EXPECTED_RELEASE_VERSION} is not of format 'major[.minor[.incremental[.build]]]'"
+              exit 1
+            fi
+            # Split release version parts into ARRAY
+            _IFS=$IFS && IFS='.' && read -r -a ARRAY <<< "${_EXPECTED_RELEASE_VERSION}" && IFS=$_IFS
+            j=$((${#ARRAY[@]} - 1))
+            if [[ -z "${_INDEX_DIGIT_TO_INCREMENT}" ]]; then
+              ARRAY[$j]=$((ARRAY[$j] + 1))
+            else
+              ARRAY[$_INDEX_DIGIT_TO_INCREMENT]=$((ARRAY[$_INDEX_DIGIT_TO_INCREMENT] + 1))
+            fi
+            _EXPECTED_NEXT_SNAPSHOT_VERSION=""
+            for i in ${!ARRAY[@]}; do
+              _EXPECTED_NEXT_SNAPSHOT_VERSION="${_EXPECTED_NEXT_SNAPSHOT_VERSION}${ARRAY[$i]}"
+              [[ $i -lt $j ]] && _EXPECTED_NEXT_SNAPSHOT_VERSION="${_EXPECTED_NEXT_SNAPSHOT_VERSION}."
+            done
+            _EXPECTED_NEXT_SNAPSHOT_VERSION="${_EXPECTED_NEXT_SNAPSHOT_VERSION}-SNAPSHOT"
+            echo "${_EXPECTED_NEXT_SNAPSHOT_VERSION}"
+          }
+ 
+          MAVEN_PROJECT_VERSION=$(mvn -q -Dexpression=project.version -DforceStdout help:evaluate)
+          EXPECTED_RELEASE_VERSION="${MAVEN_PROJECT_VERSION%*-SNAPSHOT}"
+          echo "Expected release version derived from project POM: ${EXPECTED_RELEASE_VERSION}"
+ 
+          # Validate release version calculated
+          UNLEASH_CALCULATED_RELEASE_VERSION=$(mvn -q unleash:releaseVersion -DforceStdout)
+          echo "Unleash calculated release version: ${UNLEASH_CALCULATED_RELEASE_VERSION}"
+          if [[ "${UNLEASH_CALCULATED_RELEASE_VERSION}" != "${EXPECTED_RELEASE_VERSION}" ]]; then
+            echo "### ERROR: UNLEASH_CALCULATED_RELEASE_VERSION is not equal to EXPECTED_RELEASE_VERSION"
+            exit 1
+          fi
+ 
+          # Validate next SNAPSHOT calculated with DEFAULT version upgrade strategy
+          echo "Test next SNAPSHOT version with DEFAULT version upgrade strategy:"
+          EXPECTED_NEXT_SNAPSHOT_VERSION=$(_calcNextSnapshotVersionExpected "${EXPECTED_RELEASE_VERSION}")
+          echo "  Expected next DEFAULT snapshot version: ${EXPECTED_NEXT_SNAPSHOT_VERSION}"
+          UNLEASH_CALCULATED_NEXT_SNAPSHOT_VERSION=$(mvn -q unleash:nextSnapshotVersion -DforceStdout)
+          echo "  Unleash calculated next snapshot version: ${UNLEASH_CALCULATED_NEXT_SNAPSHOT_VERSION}"
+          if [[ "${UNLEASH_CALCULATED_NEXT_SNAPSHOT_VERSION}" != "${EXPECTED_NEXT_SNAPSHOT_VERSION}" ]]; then
+            echo "### ERROR: UNLEASH_CALCULATED_NEXT_SNAPSHOT_VERSION is not equal to EXPECTED_NEXT_SNAPSHOT_VERSION"
+            exit 1
+          fi
+ 
+          # Validate next SNAPSHOT calculated with MAJOR version upgrade strategy
+          echo "Test next SNAPSHOT version with MAJOR version upgrade strategy:"
+          EXPECTED_NEXT_SNAPSHOT_VERSION=$(_calcNextSnapshotVersionExpected "${EXPECTED_RELEASE_VERSION}" 0)
+          echo "  Expected next MAJOR snapshot version: ${EXPECTED_NEXT_SNAPSHOT_VERSION}"
+          UNLEASH_CALCULATED_NEXT_SNAPSHOT_VERSION=$(mvn -q unleash:nextSnapshotVersion -Dunleash.versionUpgradeStrategy=MAJOR -DforceStdout)
+          echo "  Unleash calculated next MAJOR snapshot version: ${UNLEASH_CALCULATED_NEXT_SNAPSHOT_VERSION}"
+          if [[ "${UNLEASH_CALCULATED_NEXT_SNAPSHOT_VERSION}" != "${EXPECTED_NEXT_SNAPSHOT_VERSION}" ]]; then
+            echo "### ERROR: UNLEASH_CALCULATED_NEXT_SNAPSHOT_VERSION is not equal to EXPECTED_NEXT_SNAPSHOT_VERSION"
+            exit 1
+          fi
+
+
   job_Test_Unleash_01:
     # Test 01 logScmProviderTagAndMsgPrefix.txt
     name: T01
-    needs: job_Reset_TestBranch
+    needs: job_Test_Unleash_Version_Goals
     strategy:
       max-parallel: 1
       matrix:
@@ -107,6 +214,7 @@ jobs:
       mavenVersion: ${{ matrix.mavenVersion }}
       mavenOpts: -Dversion.java=${{ matrix.javaVersion }}
       javaHomeVersion: ${{ matrix.javaVersion }}
+
 
   job_Test_Unleash_02:
     # Test 02 RollbackAfterTagScm
@@ -131,6 +239,7 @@ jobs:
       mavenVersion: ${{ matrix.mavenVersion }}
       mavenOpts: -Dversion.java=${{ matrix.javaVersion }}
       javaHomeVersion: ${{ matrix.javaVersion }}
+
 
   job_Test_Unleash_03:
     # Test 03 NoDeployRollbackAfterInstallArtifacts
