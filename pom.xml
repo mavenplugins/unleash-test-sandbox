@@ -65,10 +65,9 @@
     <version.maven-plugin-plugin>3.13.1</version.maven-plugin-plugin>
     <version.plexus-component-metadata>2.2.0</version.plexus-component-metadata>
     <!-- 3rd PARTY -->
-    <version.guava>23.0</version.guava>
     <version.commons-lang3>3.4</version.commons-lang3>
     <!-- TEST -->
-    <version.junit>4.12</version.junit>
+    <version.junit>4.13.2</version.junit>
     <version.junit-dataprovider>1.13.1</version.junit-dataprovider>
     <version.mockito-all>1.10.19</version.mockito-all>
   </properties>
@@ -100,11 +99,6 @@
       </dependency>
 
       <!-- 3rd PARTY DEPENDENCIES -->
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>${version.guava}</version>
-      </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
