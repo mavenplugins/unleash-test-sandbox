@@ -86,7 +86,7 @@ jobs:
           git push -f origin ${{ github.ref }}
 
 
-  job_Test_Unleash_Version_Goals:
+  job_Test_Unleash_Version_Goals_And_Prints:
     name: Test Version Goals
     needs: job_Reset_TestBranch
     runs-on: ubuntu-latest
@@ -190,11 +190,22 @@ jobs:
             exit 1
           fi
 
+      - name: Test unleash print only options
+        run: |
+
+          # Print workflow
+          echo "Test print workflow only:"
+          mvn unleash:perform -DprintWorkflow
+
+          # Print available steps
+          echo "Test print available steps only:"
+          mvn unleash:perform -DprintSteps
+
 
   job_Test_Unleash_01:
     # Test 01 logScmProviderTagAndMsgPrefix.txt
     name: T01
-    needs: job_Test_Unleash_Version_Goals
+    needs: job_Test_Unleash_Version_Goals_And_Prints
     strategy:
       max-parallel: 1
       matrix:
