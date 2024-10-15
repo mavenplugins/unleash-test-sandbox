@@ -94,7 +94,7 @@ jobs:
       matrix:
         # use newer versions first
         javaVersion: [21, 17, 11, 8]
-        mavenVersion: [3.9.8, 3.8.3, 3.6.3]
+        mavenVersion: [3.9.8, 3.8.3, 3.6.3, 3.5.2, 3.3.9]
     steps:
       - name: Checkout test branch
         uses: actions/checkout@v4
@@ -156,7 +156,7 @@ jobs:
             echo "${_EXPECTED_NEXT_SNAPSHOT_VERSION}"
           }
  
-          MAVEN_PROJECT_VERSION=$(mvn -q -Dexpression=project.version -DforceStdout help:evaluate)
+          MAVEN_PROJECT_VERSION=$(mvn -q -Dexpression=project.version -DforceStdout -Dversion.maven-help-plugin=3.3.0 help:evaluate)
           EXPECTED_RELEASE_VERSION="${MAVEN_PROJECT_VERSION%*-SNAPSHOT}"
           echo "Expected release version derived from project POM: ${EXPECTED_RELEASE_VERSION}"
  
@@ -211,7 +211,7 @@ jobs:
       matrix:
         # use newer versions first
         javaVersion: [21, 17, 11, 8]
-        mavenVersion: [3.9.8, 3.8.3, 3.6.3]
+        mavenVersion: [3.9.8, 3.8.3, 3.6.3, 3.5.2, 3.3.9]
     # Elevate permission on repo content to write to allow git pushing
     permissions:
       contents: write
@@ -236,7 +236,7 @@ jobs:
       matrix:
         # use newer versions first
         javaVersion: [21, 17, 11, 8]
-        mavenVersion: [3.9.8, 3.8.3, 3.6.3]
+        mavenVersion: [3.9.8, 3.8.3, 3.6.3, 3.5.2, 3.3.9]
     # Elevate permission on repo content to write to allow git pushing
     permissions:
       contents: write
@@ -261,7 +261,7 @@ jobs:
       matrix:
         # use newer versions first
         javaVersion: [21, 17, 11, 8]
-        mavenVersion: [3.9.8, 3.8.3, 3.6.3]
+        mavenVersion: [3.9.8, 3.8.3, 3.6.3, 3.5.2, 3.3.9]
     # Elevate permission on repo content to write to allow git pushing
     permissions:
       contents: write
