@@ -273,5 +273,5 @@ jobs:
       enforceUnleashReleaseWorkflow: false
       unleashWorkflowURL: ${{vars.UNLEASH_E2E_TEST_WORKFLOWS_BASE_URL }}/performReleaseNoDeployRollbackAfterInstallArtifacts.txt
       mavenVersion: ${{ matrix.mavenVersion }}
-      mavenOpts: -Dversion.java=${{ matrix.javaVersion }}
+      mavenOpts: '-Dversion.java=${{ matrix.javaVersion }} -X'
       javaHomeVersion: ${{ matrix.javaVersion }}
