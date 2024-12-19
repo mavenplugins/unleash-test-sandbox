@@ -10,7 +10,7 @@
 
   <groupId>io.github.mavenplugins.test</groupId>
   <artifactId>unleash-sandbox-parent</artifactId>
-  <version>1.0.14</version>
+  <version>1.0.15-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Unleash Sandbox Parent</name>
@@ -35,7 +35,7 @@
   <scm>
     <connection>scm:git:https://github.com/mavenplugins/unleash-test-sandbox.git</connection>
     <url>https://github.com/mavenplugins/unleash-test-sandbox</url>
-    <tag>v1.0.14</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <issueManagement>
