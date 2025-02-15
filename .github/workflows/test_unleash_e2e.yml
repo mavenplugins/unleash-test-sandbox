@@ -85,6 +85,15 @@ jobs:
           git reset --hard ${RESET_COMMIT_SHA1}
           git push -f origin ${{ github.ref }}
 
+      - name: Delete all tags "v*.*.*"
+        run: |
+          TAGS_TO_DELETE=$(git ls-remote --tags origin -l "v*.*.*" | awk '{print $2}')
+          if [[ -n "${TAGS_TO_DELETE}" ]]; then
+            git push -d origin ${TAGS_TO_DELETE}
+          else
+            echo "No tags to delete."
+          fi
+
 
   job_Test_Unleash_Version_Goals_And_Prints:
     name: Test Version Goals
