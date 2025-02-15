@@ -59,3 +59,12 @@ jobs:
           RESET_COMMIT_SHA1=$(git log ${{ vars.UNLEASH_E2E_TEST_RESET_REF }} --max-count=1 --pretty=%H)
           git reset --hard ${RESET_COMMIT_SHA1}
           git push -f origin ${{ vars.UNLEASH_E2E_TEST_REF }}
+
+      - name: Delete all tags "v*.*.*"
+        run: |
+          TAGS_TO_DELETE=$(git ls-remote --tags origin -l "v*.*.*" | awk '{print $2}')
+          if [[ -n "${TAGS_TO_DELETE}" ]]; then
+            git push -d origin ${TAGS_TO_DELETE}
+          else
+            echo "No tags to delete."
+          fi
