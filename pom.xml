@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.github.mavenplugins</groupId>
     <artifactId>org-parent</artifactId>
-    <version>8</version>
+    <version>11</version>
     <relativePath />
   </parent>
 
@@ -52,16 +52,19 @@
 
   <properties>
     <!-- Override Unleash plugin versions -->
-    <version.unleash-maven-plugin>3.2.1-SNAPSHOT</version.unleash-maven-plugin>
+    <version.unleash-maven-plugin>3.2.2-SNAPSHOT</version.unleash-maven-plugin>
     <!-- Unleash SCM Provider (Git) -->
-    <version.unleash-scm-provider-git>3.3.0-SNAPSHOT</version.unleash-scm-provider-git>
+    <version.unleash-scm-provider-git>3.3.1-SNAPSHOT</version.unleash-scm-provider-git>
     <!-- Unleash CDI Plugin Hooks -->
-    <version.cdi-plugin-hooks>0.2.1-SNAPSHOT</version.cdi-plugin-hooks>
+    <version.cdi-plugin-hooks>0.2.2-SNAPSHOT</version.cdi-plugin-hooks>
 
     <version.java>1.8</version.java>
     <javadoc.doclint>none</javadoc.doclint>
     <!-- MAVEN -->
-    <version.maven>3.3.9</version.maven>
+    <!-- Make dependabot security check happy with Maven 3.8.1+ -->
+    <version.maven>3.8.1</version.maven>
+    <!-- e2e testing requires to run on Maven 3.3.9+ -->
+    <maven.enforce.version.range>[3.3.9,)</maven.enforce.version.range>
     <version.maven-plugin-plugin>3.12.0</version.maven-plugin-plugin>
     <version.plexus-component-metadata>2.2.0</version.plexus-component-metadata>
     <!-- 3rd PARTY -->
