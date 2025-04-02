@@ -87,7 +87,7 @@ jobs:
 
       - name: Delete all tags "v*.*.*"
         run: |
-          TAGS_TO_DELETE=$(git ls-remote --tags origin -l "v*.*.*" | awk '{print $2}')
+          TAGS_TO_DELETE=$(git ls-remote --refs --tags origin -l "v*.*.*" | awk '{print $2}')
           if [[ -n "${TAGS_TO_DELETE}" ]]; then
             git push -d origin ${TAGS_TO_DELETE}
           else
