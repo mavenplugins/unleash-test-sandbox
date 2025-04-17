@@ -232,8 +232,7 @@ jobs:
       enforceUnleashReleaseWorkflow: false
       unleashWorkflowURL: ${{vars.UNLEASH_E2E_TEST_WORKFLOWS_BASE_URL }}/logScmProviderTagAndMsgPrefix.txt
       mavenVersion: ${{ matrix.mavenVersion }}
-      mavenOpts: -Dversion.java=${{ matrix.javaVersion }}
-      unleashOptsToAppend: -Dunleash.isDeployDryRun=true
+      mavenOpts: '-Dversion.java=${{ matrix.javaVersion }} -Dunleash.isDeployDryRun=true'
       javaHomeVersion: ${{ matrix.javaVersion }}
 
 
@@ -258,8 +257,7 @@ jobs:
       enforceUnleashReleaseWorkflow: false
       unleashWorkflowURL: ${{vars.UNLEASH_E2E_TEST_WORKFLOWS_BASE_URL }}/performReleaseRollbackAfterTagScm.txt
       mavenVersion: ${{ matrix.mavenVersion }}
-      mavenOpts: -Dversion.java=${{ matrix.javaVersion }}
-      unleashOptsToAppend: -Dunleash.isDeployDryRun=true
+      mavenOpts: '-Dversion.java=${{ matrix.javaVersion }} -Dunleash.isDeployDryRun=true'
       javaHomeVersion: ${{ matrix.javaVersion }}
 
 
@@ -284,7 +282,6 @@ jobs:
       enforceUnleashReleaseWorkflow: false
       unleashWorkflowURL: ${{vars.UNLEASH_E2E_TEST_WORKFLOWS_BASE_URL }}/performReleaseRollbackAfterDeployArtifacts.txt
       mavenVersion: ${{ matrix.mavenVersion }}
-      mavenOpts: '-X -Dversion.java=${{ matrix.javaVersion }}'
-      #mavenOpts: -Dversion.java=${{ matrix.javaVersion }}
-      unleashOptsToAppend: -Dunleash.isDeployDryRun=true
+      mavenOpts: '-Dversion.java=${{ matrix.javaVersion }} -Dunleash.isDeployDryRun=true'
+      unleashOptsToAppend: -X
       javaHomeVersion: ${{ matrix.javaVersion }}
