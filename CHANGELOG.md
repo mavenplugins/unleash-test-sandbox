@@ -67,7 +67,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.0.0]
 <!-- !!! Align version in badge URLs as well !!! -->
-[![1.0.0 Badge](https://img.shields.io/nexus/r/io.github.mavenplugins/cdi-plugin-hooks?server=https://s01.oss.sonatype.org&label=Maven%20Central&queryOpt=:v=1.0.0)](https://central.sonatype.com/artifact/io.github.mavenplugins/cdi-plugin-hooks/1.0.0)
+[![1.0.0 Badge](https://img.shields.io/maven-central/v/io.github.mavenplugins/cdi-plugin-hooks?label=Maven%20Central&filter=1.0.0)](https://central.sonatype.com/artifact/io.github.mavenplugins/cdi-plugin-hooks/1.0.0)
 
 ### Summary
 - Initial release
