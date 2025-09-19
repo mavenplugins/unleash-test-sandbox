@@ -52,7 +52,7 @@
 
   <properties>
     <!-- Override Unleash plugin versions -->
-    <version.unleash-maven-plugin>3.3.2-SNAPSHOT</version.unleash-maven-plugin>
+    <version.unleash-maven-plugin>3.3.3-SNAPSHOT</version.unleash-maven-plugin>
     <unleash.artifactSpyPluginVersion>1.1.1-SNAPSHOT</unleash.artifactSpyPluginVersion>
     <!-- Unleash SCM Provider (Git) -->
     <version.unleash-scm-provider-git>3.3.1-SNAPSHOT</version.unleash-scm-provider-git>
