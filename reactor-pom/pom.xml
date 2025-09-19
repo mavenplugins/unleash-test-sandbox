@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.github.mavenplugins</groupId>
+    <artifactId>org-parent</artifactId>
+    <version>13</version>
+    <relativePath />
+  </parent>
+
+  <groupId>io.github.mavenplugins.test</groupId>
+  <artifactId>unleash-sandbox-reactor-pom</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>Unleash Sandbox Reactor</name>
+  <description>
+    A project supposed to test unleash perform variants and workflows on.
+  </description>
+  <url>https://github.com/mavenplugins/unleash-test-sandbox</url>
+  <inceptionYear>2024</inceptionYear>
+
+  <developers>
+    <developer>
+      <id>mavenplugins</id>
+      <!-- Let Maven Central Search show 'Public Project' as known contributors tag -->
+      <name>Public Project</name>
+      <url>https://github.com/mavenplugins/unleash-test-sandbox/graphs/contributors</url>
+      <organization>mavenplugins</organization>
+      <organizationUrl>https://github.com/mavenplugins/</organizationUrl>
+      <timezone>1</timezone>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:https://github.com/mavenplugins/unleash-test-sandbox.git</connection>
+    <url>https://github.com/mavenplugins/unleash-test-sandbox</url>
+    <tag>HEAD</tag>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/mavenplugins/unleash-test-sandbox/issues</url>
+  </issueManagement>
+
+  <properties>
+    <!-- Override Unleash plugin versions -->
+    <version.unleash-maven-plugin>3.3.3-SNAPSHOT</version.unleash-maven-plugin>
+    <unleash.artifactSpyPluginVersion>1.1.1-SNAPSHOT</unleash.artifactSpyPluginVersion>
+    <!-- Unleash SCM Provider (Git) -->
+    <version.unleash-scm-provider-git>3.3.1-SNAPSHOT</version.unleash-scm-provider-git>
+    <!-- Unleash CDI Plugin Hooks -->
+    <version.cdi-plugin-hooks>0.2.2-SNAPSHOT</version.cdi-plugin-hooks>
+  </properties>
+
+  <modules>
+    <module>..</module>
+  </modules>
+
+</project>
