@@ -2,7 +2,7 @@ name: Test Maven Unleash E2E
 
 on:
   workflow_dispatch:
-        
+
   # ┌───────────── minute (0 - 59)
   # │ ┌───────────── hour (0 - 23)
   # │ │ ┌───────────── day of the month (1 - 31)

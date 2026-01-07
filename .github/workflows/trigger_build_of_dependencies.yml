@@ -1,0 +1,67 @@
+name: Trigger Dependency Builds
+
+on:
+  workflow_dispatch:
+
+  # ┌───────────── minute (0 - 59)
+  # │ ┌───────────── hour (0 - 23)
+  # │ │ ┌───────────── day of the month (1 - 31)
+  # │ │ │ ┌───────────── month (1 - 12 or JAN-DEC)
+  # │ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
+  # │ │ │ │ │
+  # │ │ │ │ │
+  # │ │ │ │ │
+  # * * * * *
+  schedule:
+    - cron: '17 6 * * 1' # run at 6:17 UTC every Monday
+
+  # NEVER enable push - this will run infinite for this workflow since of self re-triggering!
+  #push:
+    #branches:
+    #  - 'test/unleash_e2e'
+
+concurrency:
+  # Ensure this workflow is running single at a time
+  #group: ${{ github.workflow }}-${{ github.ref }}
+  #group: ${{ github.workflow }}
+  group: ${{ vars.UNLEASH_E2E_TEST_REF }}
+  cancel-in-progress: false
+
+# Following variables from vars context are being expected:
+#   vars.UNLEASH_E2E_TEST_REF
+#   vars.UNLEASH_E2E_TEST_RESET_REF
+#   vars.UNLEASH_E2E_TEST_WORKFLOWS_BASE_URL
+
+jobs:
+  job_Trigger_DependencySnapshotBuilds:
+    name: Trigger Dependency Snapshot Builds
+    if: github.ref == vars.UNLEASH_E2E_TEST_REF
+    runs-on: ubuntu-latest
+    steps:
+      # See https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event
+      - name: Trigger dependency builds
+        run: |
+          # list of projects
+          PROJECTS=(
+            "${{ env.REPO_OWNER }}/artifact-spy-plugin"
+            "${{ env.REPO_OWNER }}/maven-cdi-plugin-utils"
+            "${{ env.REPO_OWNER }}/maven-cdi-plugin-hooks"
+            "${{ env.REPO_OWNER }}/unleash-scm-provider-git"
+            "${{ env.REPO_OWNER }}/unleash-maven-plugin"
+          )
+          # loop through projects
+          for PROJECT in "${PROJECTS[@]}"
+          do
+            echo "Triggering build of ${PROJECT}"
+            curl -L \
+                 --fail-with-body \
+                 -X POST \
+                 -H "Accept: application/vnd.github+json" \
+                 -H "Authorization: Bearer ${{ env.SERVICE_USER_PAT }}" \
+                 -H "X-GitHub-Api-Version: 2022-11-28" \
+                 "https://api.github.com/repos/${PROJECT}/actions/workflows/build_and_deploy.yml/dispatches" \
+                 -d '{"ref":"master"}'
+          done
+        env:
+          REPO_OWNER: ${{ github.repository_owner }}
+          SERVICE_USER_PAT: ${{ secrets.SERVICE_USER_PAT }}
