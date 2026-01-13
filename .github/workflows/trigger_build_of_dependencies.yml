@@ -48,6 +48,7 @@ jobs:
             "${{ env.REPO_OWNER }}/maven-cdi-plugin-hooks"
             "${{ env.REPO_OWNER }}/unleash-scm-provider-git"
             "${{ env.REPO_OWNER }}/unleash-maven-plugin"
+            "${{ env.REPO_OWNER }}/unleash-test-sandbox"
           )
           # loop through projects
           for PROJECT in "${PROJECTS[@]}"
