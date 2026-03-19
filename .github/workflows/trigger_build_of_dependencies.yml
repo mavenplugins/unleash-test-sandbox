@@ -49,6 +49,7 @@ jobs:
             "${{ env.REPO_OWNER }}/unleash-scm-provider-git"
             "${{ env.REPO_OWNER }}/unleash-maven-plugin"
             "${{ env.REPO_OWNER }}/unleash-test-sandbox"
+            "${{ env.REPO_OWNER }}/gradle-maven-settings-plugin"
           )
           # loop through projects
           for PROJECT in "${PROJECTS[@]}"
