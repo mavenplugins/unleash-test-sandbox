@@ -44,7 +44,7 @@ jobs:
       actions: write
     steps:
       - name: Checkout test branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           # We need full history! - otherwise we end up in "missing commits" issue on unleash plugin
           fetch-depth: 0

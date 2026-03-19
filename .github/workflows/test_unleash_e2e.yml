@@ -69,7 +69,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout test branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           # We need full history! - otherwise we end up in "missing commits" issue on unleash plugin
           fetch-depth: 0
@@ -106,7 +106,7 @@ jobs:
         mavenVersion: [3.9.8, 3.8.3, 3.6.3, 3.5.2, 3.3.9]
     steps:
       - name: Checkout test branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           # Explicitly provide the ref path rather than using the original triggering SHA,
           # since that might have changed by particular jobs in multi job scenarios
