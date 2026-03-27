@@ -39,29 +39,51 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # See https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event
+      #
+      # Define an associative array (bash 4+)
+      #declare -A myMap
+      #myMap["key1"]="value1"
+      #myMap["key2"]="value2"
+      #myMap["key3"]="value3"
+      #
+      # Or declare inline
+      #declare -A myMap=(["key1"]="value1" ["key2"]="value2" ["key3"]="value3")
+      #
+      # Iterate over keys
+      #for key in "${!myMap[@]}"; do
+      #  echo "Key: $key, Value: ${myMap[$key]}"
+      #done
+      #
+      # Key syntax:
+      #   declare -A — declares an associative array
+      #   ${!myMap[@]} — expands to all keys
+      #   ${myMap[@]} — expands to all values
+      #   ${myMap[$key]} — access value by key
       - name: Trigger dependency builds
         run: |
-          # list of projects
-          PROJECTS=(
-            "${{ env.REPO_OWNER }}/artifact-spy-plugin"
-            "${{ env.REPO_OWNER }}/maven-cdi-plugin-utils"
-            "${{ env.REPO_OWNER }}/maven-cdi-plugin-hooks"
-            "${{ env.REPO_OWNER }}/unleash-scm-provider-git"
-            "${{ env.REPO_OWNER }}/unleash-maven-plugin"
-            "${{ env.REPO_OWNER }}/unleash-test-sandbox"
-            "${{ env.REPO_OWNER }}/gradle-maven-settings-plugin"
+          #
+          # map of projects and action to trigger:
+          declare -A PROJECTS_MAP=(
+            ["${{ env.REPO_OWNER }}/artifact-spy-plugin"]="build_and_deploy.yml"
+            ["${{ env.REPO_OWNER }}/maven-cdi-plugin-utils"]="build_and_deploy.yml"
+            ["${{ env.REPO_OWNER }}/maven-cdi-plugin-hooks"]="build_and_deploy.yml"
+            ["${{ env.REPO_OWNER }}/unleash-scm-provider-git"]="build_and_deploy.yml"
+            ["${{ env.REPO_OWNER }}/unleash-maven-plugin"]="build_and_deploy.yml"
+            ["${{ env.REPO_OWNER }}/unleash-test-sandbox"]="build_and_deploy.yml"
+            ["${{ env.REPO_OWNER }}/gradle-maven-settings-plugin"]="build.yml"
           )
           # loop through projects
-          for PROJECT in "${PROJECTS[@]}"
+          for PROJECT in "${!PROJECTS_MAP[@]}"
           do
-            echo "Triggering build of ${PROJECT}"
+            GITHUB_ACTION="${PROJECTS_MAP[$PROJECT]}"
+            echo "Triggering ${GITHUB_ACTION} of ${PROJECT}"
             curl -L \
                  --fail-with-body \
                  -X POST \
                  -H "Accept: application/vnd.github+json" \
                  -H "Authorization: Bearer ${{ env.SERVICE_USER_PAT }}" \
                  -H "X-GitHub-Api-Version: 2022-11-28" \
-                 "https://api.github.com/repos/${PROJECT}/actions/workflows/build_and_deploy.yml/dispatches" \
+                 "https://api.github.com/repos/${PROJECT}/actions/workflows/${GITHUB_ACTION}/dispatches" \
                  -d '{"ref":"master"}'
           done
         env:
