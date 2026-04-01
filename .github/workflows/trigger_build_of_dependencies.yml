@@ -13,7 +13,7 @@ on:
   # │ │ │ │ │
   # * * * * *
   schedule:
-    - cron: '17 6 * * 1' # run at 6:17 UTC every Monday
+    - cron: '17 6 * * *' # run at 6:17 UTC every day
 
   # NEVER enable push - this will run infinite for this workflow since of self re-triggering!
   #push:
