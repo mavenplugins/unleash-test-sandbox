@@ -71,6 +71,7 @@ jobs:
             ["${{ env.REPO_OWNER }}/unleash-maven-plugin"]="build_and_deploy.yml"
             ["${{ env.REPO_OWNER }}/unleash-test-sandbox"]="build_and_deploy.yml"
             ["${{ env.REPO_OWNER }}/gradle-maven-settings-plugin"]="build.yml"
+            ["${{ env.REPO_OWNER }}/gradle-xtext-builder-plugin"]="build.yml"
           )
           # loop through projects
           for PROJECT in "${!PROJECTS_MAP[@]}"
