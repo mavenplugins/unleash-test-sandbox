@@ -63,22 +63,31 @@ jobs:
         run: |
           #
           # map of projects and action to trigger:
+          #
+          #  key: "<repo_owner>/<repo>@<branch>[@n]"
+          #                                      |
+          #                                      +- n to be used, if multiple actions for same branch to be triggered
           declare -A PROJECTS_MAP=(
-            ["${{ env.REPO_OWNER }}/artifact-spy-plugin"]="build_and_deploy.yml"
-            ["${{ env.REPO_OWNER }}/maven-cdi-plugin-utils"]="build_and_deploy.yml"
-            ["${{ env.REPO_OWNER }}/maven-cdi-plugin-hooks"]="build_and_deploy.yml"
-            ["${{ env.REPO_OWNER }}/unleash-scm-provider-git"]="build_and_deploy.yml"
-            ["${{ env.REPO_OWNER }}/unleash-maven-plugin"]="build_and_deploy.yml"
-            ["${{ env.REPO_OWNER }}/unleash-test-sandbox"]="build_and_deploy.yml"
-            ["${{ env.REPO_OWNER }}/central-publishing-maven-plugin"]="build_and_deploy.yml"
-            ["${{ env.REPO_OWNER }}/gradle-maven-settings-plugin"]="build.yml"
-            ["${{ env.REPO_OWNER }}/gradle-xtext-builder-plugin"]="build.yml"
+            ["${{ env.REPO_OWNER }}/artifact-spy-plugin@master"]="build_and_deploy.yml"
+            ["${{ env.REPO_OWNER }}/maven-cdi-plugin-utils@master"]="build_and_deploy.yml"
+            ["${{ env.REPO_OWNER }}/maven-cdi-plugin-hooks@master"]="build_and_deploy.yml"
+            ["${{ env.REPO_OWNER }}/unleash-scm-provider-git@master"]="build_and_deploy.yml"
+            ["${{ env.REPO_OWNER }}/unleash-maven-plugin@master"]="build_and_deploy.yml"
+            ["${{ env.REPO_OWNER }}/unleash-test-sandbox@master"]="build_and_deploy.yml"
+            ["${{ env.REPO_OWNER }}/central-publishing-maven-plugin@master"]="build_and_deploy.yml"
+            ["${{ env.REPO_OWNER }}/gradle-maven-settings-plugin@master"]="build.yml"
+            ["${{ env.REPO_OWNER }}/gradle-maven-settings-plugin@preview"]="build.yml"
+            ["${{ env.REPO_OWNER }}/gradle-xtext-builder-plugin@master"]="build.yml"
+            ["${{ env.REPO_OWNER }}/gradle-xtext-builder-plugin@preview"]="build.yml"
           )
           # loop through projects
-          for PROJECT in "${!PROJECTS_MAP[@]}"
+          for KEY in "${!PROJECTS_MAP[@]}"
           do
-            GITHUB_ACTION="${PROJECTS_MAP[$PROJECT]}"
-            echo "Triggering ${GITHUB_ACTION} of ${PROJECT}"
+            GITHUB_ACTION="${PROJECTS_MAP[$KEY]}"
+            PROJECT="${KEY%%@*}"
+            BRANCH="${KEY#*@}"
+            BRANCH="${BRANCH%%@*}"
+            echo "Triggering '${GITHUB_ACTION}' on branch '${BRANCH}' of '${PROJECT}'"
             curl -L \
                  --fail-with-body \
                  -X POST \
@@ -86,7 +95,7 @@ jobs:
                  -H "Authorization: Bearer ${{ env.SERVICE_USER_PAT }}" \
                  -H "X-GitHub-Api-Version: 2022-11-28" \
                  "https://api.github.com/repos/${PROJECT}/actions/workflows/${GITHUB_ACTION}/dispatches" \
-                 -d '{"ref":"master"}'
+                 -d '{"ref":"'"${BRANCH}"'"}'
           done
         env:
           REPO_OWNER: ${{ github.repository_owner }}
