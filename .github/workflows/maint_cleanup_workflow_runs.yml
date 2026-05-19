@@ -64,9 +64,9 @@ on:
           - skipped
           - success
       dry_run:
-        description: 'If not empty logs simulated changes only, no deletions are performed'
+        description: 'If set, then simulate changes only, no deletions are performed'
         required: false
-        type: string
+        type: boolean
 
 jobs:
   del_runs:
@@ -84,7 +84,7 @@ jobs:
     steps:
       - name: Delete workflow runs (manually triggered)
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        uses: GHCICD/delete-workflow-runs@v2
+        uses: GHCICD/delete-workflow-runs@vHEAD
         with:
           token: ${{ github.token }}
           #repository: ${{ github.repository_owner }}/${{ matrix.repository }}
@@ -99,11 +99,11 @@ jobs:
               && 'action_required,cancelled,failure,skipped'
               || github.event.inputs.delete_run_by_conclusion_pattern
             }}
-          dry_run: ${{ github.event.inputs.dry_run }}
+          dry_run: ${{ github.event.inputs.dry_run == 'true' }}
 
       - name: Delete workflow runs (triggered by schedule)
         if: ${{ github.event_name == 'schedule' }}
-        uses: GHCICD/delete-workflow-runs@v2
+        uses: GHCICD/delete-workflow-runs@vHEAD
         with:
           token: ${{ github.token }}
           #repository: ${{ github.repository_owner }}/${{ matrix.repository }}
@@ -113,4 +113,4 @@ jobs:
           delete_workflow_pattern: ''
           delete_workflow_by_state_pattern: 'ALL'
           delete_run_by_conclusion_pattern: 'ALL'
-          dry_run: ''
+          dry_run: false
