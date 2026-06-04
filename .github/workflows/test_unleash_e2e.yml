@@ -102,8 +102,8 @@ jobs:
     strategy:
       matrix:
         # use newer versions first
-        javaVersion: [25, 21, 17, 11, 8]
-        mavenVersion: [3.9.8, 3.8.3, 3.6.3, 3.5.2, 3.3.9]
+        javaVersion: [21, 17, 11, 8]
+        mavenVersion: [3.9.15, 3.9.12, 3.9.8, 3.8.3, 3.6.3, 3.5.2, 3.3.9]
     steps:
       - name: Checkout test branch
         uses: actions/checkout@v6
@@ -220,7 +220,7 @@ jobs:
       matrix:
         # use newer versions first
         javaVersion: [25, 21, 17, 11, 8]
-        mavenVersion: [3.9.8, 3.8.3, 3.6.3, 3.5.2, 3.3.9]
+        mavenVersion: [3.9.15, 3.9.12, 3.9.8, 3.8.3, 3.6.3, 3.5.2, 3.3.9]
     # Elevate permission on repo content to write to allow git pushing
     permissions:
       contents: write
@@ -245,7 +245,7 @@ jobs:
       matrix:
         # use newer versions first
         javaVersion: [25, 21, 17, 11, 8]
-        mavenVersion: [3.9.8, 3.8.3, 3.6.3, 3.5.2, 3.3.9]
+        mavenVersion: [3.9.15, 3.9.12, 3.9.8, 3.8.3, 3.6.3, 3.5.2, 3.3.9]
     # Elevate permission on repo content to write to allow git pushing
     permissions:
       contents: write
@@ -270,7 +270,7 @@ jobs:
       matrix:
         # use newer versions first
         javaVersion: [25, 21, 17, 11, 8]
-        mavenVersion: [3.9.8, 3.8.3, 3.6.3, 3.5.2, 3.3.9]
+        mavenVersion: [3.9.15, 3.9.12, 3.9.8, 3.8.3, 3.6.3, 3.5.2, 3.3.9]
     # Elevate permission on repo content to write to allow git pushing
     permissions:
       contents: write
