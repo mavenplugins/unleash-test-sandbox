@@ -100,9 +100,10 @@ jobs:
     needs: job_Reset_TestBranch
     runs-on: ubuntu-latest
     strategy:
+      max-parallel: 1
       matrix:
         # use newer versions first
-        javaVersion: [21, 17, 11, 8]
+        javaVersion: [25, 21, 17, 11, 8]
         mavenVersion: [3.9.15, 3.9.12, 3.9.8, 3.8.3, 3.6.3, 3.5.2, 3.3.9]
     steps:
       - name: Checkout test branch
@@ -170,6 +171,8 @@ jobs:
           echo "Expected release version derived from project POM: ${EXPECTED_RELEASE_VERSION}"
  
           # Validate release version calculated
+          # Run the command once with all outputs visible
+          mvn -U unleash:releaseVersion
           UNLEASH_CALCULATED_RELEASE_VERSION=$(mvn -q unleash:releaseVersion -DforceStdout)
           echo "Unleash calculated release version: ${UNLEASH_CALCULATED_RELEASE_VERSION}"
           if [[ "${UNLEASH_CALCULATED_RELEASE_VERSION}" != "${EXPECTED_RELEASE_VERSION}" ]]; then
