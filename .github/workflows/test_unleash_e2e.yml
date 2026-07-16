@@ -67,6 +67,8 @@ jobs:
     # Elevate permission on repo content to write to allow git pushing
     permissions:
       contents: write
+    outputs:
+      cacheKey: m2-unleash-e2e-${{ steps.reset-commit.outputs.resetCommitSHA1 }}
     steps:
       - name: Checkout test branch
         uses: actions/checkout@v6
@@ -79,9 +81,11 @@ jobs:
           token: ${{ secrets.SERVICE_USER_PAT }}
         
       - name: Force reset of test branch
+        id: reset-commit
         run: |
           git fetch --all
           RESET_COMMIT_SHA1=$(git log ${{ vars.UNLEASH_E2E_TEST_RESET_REF }} --max-count=1 --pretty=%H)
+          echo "resetCommitSHA1=${RESET_COMMIT_SHA1}" >> "$GITHUB_OUTPUT"
           git reset --hard ${RESET_COMMIT_SHA1}
           git push -f origin ${{ github.ref }}
 
@@ -113,7 +117,13 @@ jobs:
           # since that might have changed by particular jobs in multi job scenarios
           ref: ${{ github.ref }}
           token: ${{ secrets.SERVICE_USER_PAT }}
-        
+
+      - name: Cache Maven repo
+        uses: actions/cache@v6
+        with:
+          path: ~/.m2/repository
+          key: ${{ needs.job_Reset_TestBranch.outputs.cacheKey }}
+
       # Setup JAVA home with Maven settings
       - name: Setup JAVA home with Maven settings.xml
         id: setup-java-home
@@ -121,7 +131,7 @@ jobs:
         with:
           java-version: ${{ matrix.javaVersion }}
           distribution: zulu
- 
+
       - name: Determine default installed Maven version
         id: default-maven
         run: |
@@ -217,7 +227,7 @@ jobs:
   job_Test_Unleash_01:
     # Test 01 logScmProviderTagAndMsgPrefix.txt
     name: T01
-    needs: job_Test_Unleash_Version_Goals_And_Prints
+    needs: [job_Test_Unleash_Version_Goals_And_Prints, job_Reset_TestBranch]
     strategy:
       max-parallel: 1
       matrix:
@@ -237,12 +247,13 @@ jobs:
       mavenVersion: ${{ matrix.mavenVersion }}
       mavenOpts: '-Dversion.java=${{ matrix.javaVersion }} -Dunleash.isDeployDryRun=true'
       javaHomeVersion: ${{ matrix.javaVersion }}
+      mavenCacheKey: ${{ needs.job_Reset_TestBranch.outputs.cacheKey }}
 
 
   job_Test_Unleash_02:
     # Test 02 RollbackAfterTagScm
     name: T02
-    needs: job_Test_Unleash_01
+    needs: [job_Test_Unleash_01, job_Reset_TestBranch]
     strategy:
       max-parallel: 1
       matrix:
@@ -262,12 +273,13 @@ jobs:
       mavenVersion: ${{ matrix.mavenVersion }}
       mavenOpts: '-Dversion.java=${{ matrix.javaVersion }} -Dunleash.isDeployDryRun=true'
       javaHomeVersion: ${{ matrix.javaVersion }}
+      mavenCacheKey: ${{ needs.job_Reset_TestBranch.outputs.cacheKey }}
 
 
   job_Test_Unleash_03:
     # Test 03 NoDeployRollbackAfterInstallArtifacts
     name: T03
-    needs: job_Test_Unleash_02
+    needs: [job_Test_Unleash_02, job_Reset_TestBranch]
     strategy:
       max-parallel: 1
       matrix:
@@ -288,3 +300,25 @@ jobs:
       mavenOpts: '-Dversion.java=${{ matrix.javaVersion }} -Dunleash.isDeployDryRun=true'
       unleashOptsToAppend: -X
       javaHomeVersion: ${{ matrix.javaVersion }}
+      mavenCacheKey: ${{ needs.job_Reset_TestBranch.outputs.cacheKey }}
+
+
+  job_Clear_Cache:
+    name: Clear Cache
+    needs: [job_Test_Unleash_03, job_Reset_TestBranch]
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Delete cache
+        shell: bash
+        run: |
+          CACHE_KEY="${{ needs.job_Reset_TestBranch.outputs.cacheKey }}"
+          echo "deleting cache ${CACHE_KEY}"
+          gh api \
+            --method DELETE \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${GITHUB_REPOSITORY}/actions/caches?key=${CACHE_KEY}"
+        env:
+          GH_TOKEN: ${{ github.token }}
